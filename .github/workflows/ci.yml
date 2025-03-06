@@ -9,53 +9,44 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK 11
+      - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
           distribution: 'temurin'
-          cache: maven
+          java-version: '11'
 
       - name: Install dependencies
-        run: mvn clean install -DskipTests
+        run: mvn install
 
-      - name: Run Selenium tests
+      - name: Run Selenium Tests
         run: mvn test
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: target/surefire-reports
+      - name: Send Slack Notification on Success
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"✅ CI Pipeline Passed Successfully!"}' ${{ secrets.SLACK_WEBHOOK }}
 
-  notify:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send Email Notification
+      - name: Send Slack Notification on Failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ CI Pipeline Failed!"}' ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Send Email Notification on Failure
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
+          server_address: smtp.office365.com
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "🚨 GitHub Actions CI Failed!"
-          body: "The CI pipeline failed. Check logs here: https://github.com/lady-emily/CI-Pipeline_GitHubActions_Selenium/actions"
-          to: "your-email@example.com"
-          from: "GitHub Actions Bot"
-
-      - name: Send Slack Notification
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "🚨 GitHub Actions CI Failed! Check logs: https://github.com/lady-emily/CI-Pipeline_GitHubActions_Selenium/actions"
+          subject: "CI Build Failed 🚨"
+          body: "The CI pipeline has failed! Check the logs on GitHub Actions."
+          to: "ladyquarshie25@gmail.com"
+          from: "ladyquarshie25@gmail.com"
