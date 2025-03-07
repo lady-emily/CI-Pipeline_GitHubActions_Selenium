@@ -7,46 +7,69 @@ on:
   pull_request:
     branches:
       - main
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: maven
 
-      - name: Install dependencies
-        run: mvn install
-
-      - name: Run Selenium Tests
-        run: mvn test
-
-      - name: Send Slack Notification on Success
-        if: success()
+      - name: Install Chrome for Selenium
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"✅ CI Pipeline Passed Successfully!"}' ${{ secrets.SLACK_WEBHOOK }}
+          sudo apt update
+          sudo apt install -y google-chrome-stable
 
-      - name: Send Slack Notification on Failure
-        if: failure()
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ CI Pipeline Failed!"}' ${{ secrets.SLACK_WEBHOOK }}
+      - name: Verify Chrome Installation
+        run: google-chrome --version
 
-      - name: Send Email Notification on Failure
-        if: failure()
+      - name: Build and Run Tests
+        run: mvn clean test
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports
+          path: target/surefire-reports/
+
+  notify:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Send Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "GitHub Actions CI Pipeline completed with status: ${{ job.status }}"
+          SLACK_TITLE: "CI Pipeline Status"
+          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+
+      - name: Send Email Notification
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.office365.com
+          server_address: smtp.gmail.com
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "CI Build Failed 🚨"
-          body: "The CI pipeline has failed! Check the logs on GitHub Actions."
-          to: "ladyquarshie25@gmail.com"
-          from: "ladyquarshie25@gmail.com"
+          subject: "GitHub Actions CI Pipeline Status"
+          to: "your_email@example.com"
+          from: "GitHub Actions"
+          body: |
+            CI Pipeline has completed.
+            Status: ${{ job.status }}
+          content_type: text/plain
