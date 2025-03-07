@@ -22,28 +22,37 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Run Selenium Tests
-        run: mvn test
+      - name: Install Chrome and ChromeDriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+\.[0-9]+\.[0-9]+')
+          wget https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
 
-#      - name: Send Slack Notification on Success
-#        if: success()
-#        run: |
-#          curl -X POST -H 'Content-type: application/json' --data '{"text":"✅ CI Pipeline Passed Successfully!"}' ${{ secrets.SLACK_WEBHOOK }}
-#
-#      - name: Send Slack Notification on Failure
-#        if: failure()
-#        run: |
-#          curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ CI Pipeline Failed!"}' ${{ secrets.SLACK_WEBHOOK }}
-#
-#      - name: Send Email Notification on Failure
-#        if: failure()
-#        uses: dawidd6/action-send-mail@v3
-#        with:
-#          server_address: smtp.gmail.com
-#          server_port: 587
-#          username: ${{ secrets.EMAIL_USERNAME }}
-#          password: ${{ secrets.EMAIL_PASSWORD }}
-#          subject: "CI Build Failed 🚨"
-#          body: "The CI pipeline has failed! Check the logs on GitHub Actions."
-#          to: "equarsh33@gmail.com"
-#          from: "ladyquarshie25@gmail.com"
+      - name: Run Selenium Tests
+        run: mvn test -Dtestng.verbose=2
+
+      - name: Send Slack Notification on Success
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"✅ CI Pipeline Passed Successfully!"}' ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Send Slack Notification on Failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ CI Pipeline Failed!"}' ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Send Email Notification on Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "CI Build Failed 🚨"
+          body: "The CI pipeline has failed! Check the logs on GitHub Actions."
+          to: "equarsh33@gmail.com"
+          from: "ladyquarshie25@gmail.com"

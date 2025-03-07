@@ -32,8 +32,7 @@ public class BaseTests {
     @BeforeClass
     public void setUp(){
         ChromeOptions options = new ChromeOptions();
-     //   options.addArguments("--headless=new");
-        options.addArguments("--headless");
+        options.addArguments("--headless=new");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--no-sandbox");
