@@ -21,47 +21,32 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-
-      - name: Install ChromeDriver
-        run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+\.[0-9]+\.[0-9]+')
-          CHROMEDRIVER_VERSION=$(curl -sS https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json | jq -r '.milestones | to_entries[] | select(.value.version | startswith("'"$CHROME_VERSION"'")) | .value.version')
-
-          if [ -z "$CHROMEDRIVER_VERSION" ]; then
-            echo "❌ No matching ChromeDriver found for Chrome version: $CHROME_VERSION"
-            exit 1
-          fi
-
-          echo "✅ Installing ChromeDriver version: $CHROMEDRIVER_VERSION"
-
-          wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip
-          unzip chromedriver-linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
-          chmod +x /usr/local/bin/chromedriver
-      
+        
+      - name: Set up Maven 
+        run: mvn -version
 
       - name: Run Selenium Tests
-        run: mvn test -Dtestng.verbose=2
+        run: mvn test
 
-      - name: Send Slack Notification on Success
-        if: success()
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"✅ CI Pipeline Passed Successfully!"}' ${{ secrets.SLACK_WEBHOOK }}
+      # - name: Send Slack Notification on Success
+      #   if: success()
+      #   run: |
+      #     curl -X POST -H 'Content-type: application/json' --data '{"text":"✅ CI Pipeline Passed Successfully!"}' ${{ secrets.SLACK_WEBHOOK }}
 
-      - name: Send Slack Notification on Failure
-        if: failure()
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ CI Pipeline Failed!"}' ${{ secrets.SLACK_WEBHOOK }}
+      # - name: Send Slack Notification on Failure
+      #   if: failure()
+      #   run: |
+      #     curl -X POST -H 'Content-type: application/json' --data '{"text":"❌ CI Pipeline Failed!"}' ${{ secrets.SLACK_WEBHOOK }}
 
-      - name: Send Email Notification on Failure
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "CI Build Failed 🚨"
-          body: "The CI pipeline has failed! Check the logs on GitHub Actions."
-          to: "equarsh33@gmail.com"
-          from: "ladyquarshie25@gmail.com"
+      # - name: Send Email Notification on Failure
+      #   if: failure()
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 587
+      #     username: ${{ secrets.EMAIL_USERNAME }}
+      #     password: ${{ secrets.EMAIL_PASSWORD }}
+      #     subject: "CI Build Failed 🚨"
+      #     body: "The CI pipeline has failed! Check the logs on GitHub Actions."
+      #     to: "equarsh33@gmail.com"
+      #     from: "ladyquarshie25@gmail.com"
