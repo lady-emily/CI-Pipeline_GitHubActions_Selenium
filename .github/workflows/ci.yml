@@ -29,6 +29,20 @@ jobs:
       - name: Run Selenium Tests
         run: mvn test
 
+      - name: Send Slack Notification (Linux/macOS)
+        if: always() && runner.os != 'Windows'
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" == "success" ]; then
+            message="✅ *Tests Passed!* ✅"
+          else
+            message="❌ *Tests Failed!* ❌"
+          fi
+          curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"$message\nRepo: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\nTrigger: $GITHUB_EVENT_NAME\nCheck logs: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"}" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+        shell: bash
+
       # - name: Send Slack Notification on Success
       #   if: success()
       #   run: |
