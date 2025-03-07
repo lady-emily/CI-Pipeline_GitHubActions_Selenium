@@ -22,9 +22,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install dependencies
-        run: mvn install
-
       - name: Run Selenium Tests
         run: mvn test
 
