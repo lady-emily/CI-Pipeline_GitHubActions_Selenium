@@ -14,7 +14,7 @@ public class CustomerTests extends BaseTests {
     public void testCustomerAuthentication() throws InterruptedException{
         customerAuthenticationPage = homePage.clickCustomerLogin()
                 .selectCustomerName("Harry Potter");
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         customerAuthenticationPage.clickLoginButton();
         //assertion
         assertTrue(customerAuthenticationPage.isPageLoaded(), "Customer authentication page did not load");
