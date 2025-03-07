@@ -33,11 +33,7 @@ public class BaseTests {
     public void setUp(){
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless"); // Run in headless mode (no GUI)
-        options.addArguments("--disable-gpu"); // Disable GPU acceleration (required for headless mode)
-        options.addArguments("--no-sandbox"); // Bypass OS security model (required for CI/CD)
-        options.addArguments("--disable-dev-shm-usage"); // Overcome limited resource problems
-        options.addArguments("--remote-allow-origins=*"); // Allow remote origins (required for newer ChromeDriver versions)
-//        options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.currentTimeMillis()); // Unique user data directory
+        options.addArguments("--incognito"); // Disable GPU acceleration (required for headless mode)
 
         //Use WebDriverManager for automatic driver setup
         WebDriverManager.chromedriver().clearDriverCache().setup();

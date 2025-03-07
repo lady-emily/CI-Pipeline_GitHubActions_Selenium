@@ -22,7 +22,6 @@ public class CustomerTests extends BaseTests {
 
     @Test(priority = 2)
     public void testSuccessfulDeposit() throws InterruptedException {
-//        testCustomerAuthentication();
         customerDashboard = customerAuthenticationPage.clickLoginButton();
         Thread.sleep(1000);
         depositPage = customerDashboard.clickDeposit();
