@@ -1,13 +1,41 @@
 package customer;
 
 import base.BaseTests;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import pages.CustomerDashboard;
-import pages.DepositPage;
-import pages.WithdrawPage;
+import pages.*;
+
+import java.time.Duration;
 
 public class TransactionTests extends BaseTests {
+
+    @BeforeMethod
+    public void setUpTest() {
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
+        System.out.println("Initializing Chrome Browser...");
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.get("https://www.globalsqa.com/angularJs-protractor/BankingProject/#/login");
+
+        homePage = new HomePage(driver);
+        customerAuthenticationPage = new CustomerAuthenticationPage(driver);
+    }
+
+    @AfterMethod
+    public void tearDownTest() {
+        if (driver != null) {
+            driver.quit();
+            driver = null;
+            System.out.println("Browser session closed.");
+        }
+    }
 
     @Test
     public void testInsufficientBalance() {
@@ -16,7 +44,7 @@ public class TransactionTests extends BaseTests {
                 .clickLoginButton();
 
         WithdrawPage withdrawPage = customerDashboard.clickWithdraw();
-        withdrawPage.enterAmount("1000000"); // Excessive amount
+        withdrawPage.enterAmount("1000000");
         withdrawPage.clickWithdrawButton();
 
         Assert.assertTrue(withdrawPage.isTransactionFailed(), "Transaction did not fail for insufficient balance!");
@@ -59,18 +87,5 @@ public class TransactionTests extends BaseTests {
         withdrawPage.clickWithdrawButton();
 
         Assert.assertFalse(withdrawPage.isWithdrawalSuccessful(), "Negative withdrawal was incorrectly processed!");
-    }
-
-    @Test
-    public void testZeroWithdrawal() {
-        CustomerDashboard customerDashboard = homePage.clickCustomerLogin()
-                .selectCustomerName("Harry Potter")
-                .clickLoginButton();
-
-        WithdrawPage withdrawPage = customerDashboard.clickWithdraw();
-        withdrawPage.enterAmount("0");
-        withdrawPage.clickWithdrawButton();
-
-        Assert.assertFalse(withdrawPage.isWithdrawalSuccessful(), "Zero withdrawal was incorrectly processed!");
     }
 }

@@ -1,5 +1,9 @@
 package base;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,7 +26,7 @@ public class BaseTests {
     protected WithdrawPage withdrawPage;
     protected TransactionPage transactionPage;
     protected BankManagerPage bankManagerPage;
-    protected CustomerAuthenticationPage customerAuthenticationPage;
+    protected static CustomerAuthenticationPage customerAuthenticationPage;
 
     @BeforeClass
     public void setUp(){
