@@ -35,7 +35,7 @@ public class BaseTests {
      //   options.addArguments("--headless=new");
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
-        options.addArguments("--incognito");
+        options.addArguments("--window-size=1920,1080");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
 
