@@ -7,10 +7,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_run:
-    workflows: ["CI Pipeline"]
-    types:
-      - completed
 
 jobs:
   test:
@@ -67,7 +63,7 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "GitHub Actions CI Pipeline Status"
-          to: "your_email@example.com"
+          to: "ladyquarshie25@gmail.com"
           from: "GitHub Actions"
           body: |
             CI Pipeline has completed.
