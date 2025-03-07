@@ -41,31 +41,31 @@ jobs:
           name: test-reports
           path: target/surefire-reports/
 
-  notify:
-    needs: test
-    runs-on: ubuntu-latest
-    if: always()
-
-    steps:
-      - name: Send Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "GitHub Actions CI Pipeline completed with status: ${{ job.status }}"
-          SLACK_TITLE: "CI Pipeline Status"
-          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
-
-      - name: Send Email Notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "GitHub Actions CI Pipeline Status"
-          to: "ladyquarshie25@gmail.com"
-          from: "GitHub Actions"
-          body: |
-            CI Pipeline has completed.
-            Status: ${{ job.status }}
-          content_type: text/plain
+#  notify:
+#    needs: test
+#    runs-on: ubuntu-latest
+#    if: always()
+#
+#    steps:
+#      - name: Send Slack Notification
+#        uses: rtCamp/action-slack-notify@v2
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+#          SLACK_MESSAGE: "GitHub Actions CI Pipeline completed with status: ${{ job.status }}"
+#          SLACK_TITLE: "CI Pipeline Status"
+#          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+#
+#      - name: Send Email Notification
+#        uses: dawidd6/action-send-mail@v3
+#        with:
+#          server_address: smtp.gmail.com
+#          server_port: 587
+#          username: ${{ secrets.EMAIL_USERNAME }}
+#          password: ${{ secrets.EMAIL_PASSWORD }}
+#          subject: "GitHub Actions CI Pipeline Status"
+#          to: "ladyquarshie25@gmail.com"
+#          from: "GitHub Actions"
+#          body: |
+#            CI Pipeline has completed.
+#            Status: ${{ job.status }}
+#          content_type: text/plain
