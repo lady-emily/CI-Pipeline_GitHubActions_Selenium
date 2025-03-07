@@ -32,8 +32,12 @@ public class BaseTests {
     @BeforeClass
     public void setUp(){
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
+     //   options.addArguments("--headless=new");
+        options.addArguments("--headless");
+        options.addArguments("--disable-gpu");
         options.addArguments("--incognito");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
         //Use WebDriverManager for automatic driver setup
         WebDriverManager.chromedriver().clearDriverCache().setup();
