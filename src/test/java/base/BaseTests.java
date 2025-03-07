@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import pages.*;
@@ -30,10 +31,13 @@ public class BaseTests {
 
     @BeforeClass
     public void setUp(){
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+
         //Use WebDriverManager for automatic driver setup
         WebDriverManager.chromedriver().setup();
         //declare driver variable and initialise driver
-        driver = new ChromeDriver();
+        driver = new ChromeDriver(options);
         System.out.println("Initialising Chrome Browser...");
         driver.get("https://www.globalsqa.com/angularJs-protractor/BankingProject/#/login");
         driver.manage().window().maximize();
