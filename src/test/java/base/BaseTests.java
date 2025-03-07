@@ -36,7 +36,7 @@ public class BaseTests {
         options.addArguments("--incognito");
 
         //Use WebDriverManager for automatic driver setup
-        WebDriverManager.chromedriver().setup();
+        WebDriverManager.chromedriver().clearDriverCache().setup();
         //declare driver variable and initialise driver
         driver = new ChromeDriver(options);
         System.out.println("Initialising Chrome Browser...");
