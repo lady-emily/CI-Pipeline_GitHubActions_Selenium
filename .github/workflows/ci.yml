@@ -22,14 +22,23 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install Chrome and ChromeDriver
+      - name: Install ChromeDriver
         run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
           CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+\.[0-9]+\.[0-9]+')
-          wget https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
+          CHROMEDRIVER_VERSION=$(curl -sS https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json | jq -r '.milestones | to_entries[] | select(.value.version | startswith("'"$CHROME_VERSION"'")) | .value.version')
+
+          if [ -z "$CHROMEDRIVER_VERSION" ]; then
+            echo "❌ No matching ChromeDriver found for Chrome version: $CHROME_VERSION"
+            exit 1
+          fi
+
+          echo "✅ Installing ChromeDriver version: $CHROMEDRIVER_VERSION"
+
+          wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip
+          unzip chromedriver-linux64.zip
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+          chmod +x /usr/local/bin/chromedriver
+      
 
       - name: Run Selenium Tests
         run: mvn test -Dtestng.verbose=2
